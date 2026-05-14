@@ -41,7 +41,25 @@ public class ImportadorJSON implements ImportadorLCI {
 
     @Override
     public List<Fluxo> importarFluxos(String conteudo) {
-        return new ArrayList<>();
+        List<Fluxo> fluxos = new ArrayList<>();
+        try {
+            JsonNode root = objectMapper.readTree(conteudo);
+            JsonNode fluxosNode = root.get("fluxos");
+            if (fluxosNode != null && fluxosNode.isArray()) {
+                for (JsonNode node : fluxosNode) {
+                    Fluxo fluxo = new Fluxo();
+                    fluxo.setId(node.has("id") ? node.get("id").asLong() : null);
+                    fluxo.setQuantidade(node.get("quantidade").asDouble());
+                    
+                    // We set IDs here, but the service will need to resolve them into actual objects
+                    // Using placeholders for now if needed, or just relying on the Service to handle IDs
+                    fluxos.add(fluxo);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao importar fluxos: " + e.getMessage(), e);
+        }
+        return fluxos;
     }
 
     @Override
