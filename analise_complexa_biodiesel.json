@@ -1,0 +1,97 @@
+{
+  "processos": [
+    {
+      "id": 1,
+      "nome": "Natureza (Sol/Chuva)",
+      "tipo": "RECURSO",
+      "categoria": "RENOVAVEL",
+      "descricao": "Fontes de energia renováveis naturais"
+    },
+    {
+      "id": 2,
+      "nome": "Minas de Fosfato/Nitrogênio",
+      "tipo": "RECURSO",
+      "categoria": "NAO_RENOVAVEL",
+      "descricao": "Recursos minerais extraídos"
+    },
+    {
+      "id": 3,
+      "nome": "Mercado de Energia/Serviços",
+      "tipo": "RECURSO",
+      "categoria": "COMPRADO",
+      "descricao": "Insumos adquiridos externamente"
+    },
+    {
+      "id": 10,
+      "nome": "Fazenda de Soja",
+      "tipo": "TRANSFORMACAO",
+      "categoria": "PROCESSO",
+      "descricao": "Etapa agrícola de cultivo"
+    },
+    {
+      "id": 20,
+      "nome": "Usina de Biodiesel",
+      "tipo": "TRANSFORMACAO",
+      "categoria": "PROCESSO",
+      "descricao": "Etapa industrial de refino e transesterificação"
+    }
+  ],
+  "fluxos": [
+    {
+      "nome": "Energia Solar/Chuva",
+      "quantidade": 5.0e10,
+      "tipoRecursoId": 1001,
+      "transformidade": 1.0,
+      "origemId": 1,
+      "destinoId": 10
+    },
+    {
+      "nome": "Insumos NPK",
+      "quantidade": 500.0,
+      "tipoRecursoId": 1002,
+      "transformidade": 3.8e12,
+      "origemId": 2,
+      "destinoId": 10
+    },
+    {
+      "nome": "Combustível Trator",
+      "quantidade": 1200.0,
+      "tipoRecursoId": 1003,
+      "transformidade": 1.1e11,
+      "origemId": 3,
+      "destinoId": 10
+    },
+    {
+      "nome": "Grãos de Soja",
+      "quantidade": 5000.0,
+      "origemId": 10,
+      "destinoId": 20
+    },
+    {
+      "nome": "Eletricidade Industrial",
+      "quantidade": 2500.0,
+      "tipoRecursoId": 1004,
+      "transformidade": 1.8e11,
+      "origemId": 3,
+      "destinoId": 20
+    },
+    {
+      "nome": "Mão de Obra Industrial",
+      "quantidade": 300.0,
+      "tipoRecursoId": 1005,
+      "transformidade": 2.5e12,
+      "origemId": 3,
+      "destinoId": 20
+    },
+    {
+      "nome": "Biodiesel Final",
+      "quantidade": 4500.0,
+      "origemId": 20
+    },
+    {
+      "nome": "Glicerina (Co-produto)",
+      "quantidade": 500.0,
+      "origemId": 20
+    }
+  ]
+}
