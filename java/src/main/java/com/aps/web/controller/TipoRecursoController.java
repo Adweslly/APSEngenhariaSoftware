@@ -1,7 +1,7 @@
 package com.aps.web.controller;
 
-import com.aps.service.ProcessoService;
-import com.aps.web.dto.ProcessoDTO;
+import com.aps.service.TipoRecursoService;
+import com.aps.web.dto.TipoRecursoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,29 +9,29 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/processos")
-public class ProcessoController {
+@RequestMapping("/api/recursos")
+public class TipoRecursoController {
 
     @Autowired
-    private ProcessoService service;
+    private TipoRecursoService service;
 
     @GetMapping
-    public List<ProcessoDTO> getAll() {
+    public List<TipoRecursoDTO> getAll() {
         return service.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProcessoDTO> getById(@PathVariable Long id) {
+    public ResponseEntity<TipoRecursoDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<ProcessoDTO> create(@RequestBody ProcessoDTO dto) {
+    public ResponseEntity<TipoRecursoDTO> create(@RequestBody TipoRecursoDTO dto) {
         return ResponseEntity.ok(service.save(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProcessoDTO> update(@PathVariable Long id, @RequestBody ProcessoDTO dto) {
+    public ResponseEntity<TipoRecursoDTO> update(@PathVariable Long id, @RequestBody TipoRecursoDTO dto) {
         dto.setId(id);
         return ResponseEntity.ok(service.save(dto));
     }
