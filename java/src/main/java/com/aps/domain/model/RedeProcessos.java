@@ -1,17 +1,30 @@
 package com.aps.domain.model;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Entity
+@Table(name = "redes_processos")
 public class RedeProcessos {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     private String nome;
     private String descricao;
+    
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "rede_id")
     private List<Processo> processos;
+    
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "rede_id")
     private List<Fluxo> fluxos;
+    
     private LocalDateTime dataCriacao;
 
     public RedeProcessos() {

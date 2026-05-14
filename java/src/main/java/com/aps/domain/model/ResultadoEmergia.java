@@ -1,14 +1,26 @@
 package com.aps.domain.model;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "resultados_emergia")
 public class ResultadoEmergia {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @ManyToOne
+    @JoinColumn(name = "processo_id")
     private Processo processo;
+    
     private double emergiaTotal;
     private double emergiaDireta;
     private double emergiaIndireta;
     private double transformidade;
+    private double elr;
+    private double eyr;
+    private double esi;
     private LocalDateTime dataCalculo;
 
     public ResultadoEmergia() {}
@@ -30,6 +42,12 @@ public class ResultadoEmergia {
     public void setEmergiaIndireta(double emergiaIndireta) { this.emergiaIndireta = emergiaIndireta; }
     public double getTransformidade() { return transformidade; }
     public void setTransformidade(double transformidade) { this.transformidade = transformidade; }
+    public double getElr() { return elr; }
+    public void setElr(double elr) { this.elr = elr; }
+    public double getEyr() { return eyr; }
+    public void setEyr(double eyr) { this.eyr = eyr; }
+    public double getEsi() { return esi; }
+    public void setEsi(double esi) { this.esi = esi; }
     public LocalDateTime getDataCalculo() { return dataCalculo; }
     public void setDataCalculo(LocalDateTime dataCalculo) { this.dataCalculo = dataCalculo; }
 }

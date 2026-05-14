@@ -1,12 +1,29 @@
 package com.aps.domain.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "fluxos")
 public class Fluxo {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     private double quantidade;
+    
+    @ManyToOne
+    @JoinColumn(name = "tipo_recurso_id")
     private TipoRecurso tipoRecurso;
+    
     private double transformidade;
     private double custoEmergia;
+    
+    @ManyToOne
+    @JoinColumn(name = "origem_id")
     private Processo origem;
+    
+    @ManyToOne
+    @JoinColumn(name = "destino_id")
     private Processo destino;
 
     public Fluxo() {}

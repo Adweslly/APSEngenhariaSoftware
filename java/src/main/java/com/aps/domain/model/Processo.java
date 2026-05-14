@@ -1,16 +1,31 @@
 package com.aps.domain.model;
 
 import com.aps.domain.enums.TipoProcesso;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "processos")
 public class Processo {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     private String nome;
     private String descricao;
+    
+    @Enumerated(EnumType.STRING)
     private TipoProcesso tipo;
+    
     private String categoria;
+    
+    private boolean coproduto = true;
+    
+    @OneToMany(mappedBy = "destino", cascade = CascadeType.ALL)
     private List<Fluxo> inputs;
+    
+    @OneToMany(mappedBy = "origem", cascade = CascadeType.ALL)
     private List<Fluxo> outputs;
 
     public Processo() {
@@ -44,6 +59,8 @@ public class Processo {
     public void setTipo(TipoProcesso tipo) { this.tipo = tipo; }
     public String getCategoria() { return categoria; }
     public void setCategoria(String categoria) { this.categoria = categoria; }
+    public boolean isCoproduto() { return coproduto; }
+    public void setCoproduto(boolean coproduto) { this.coproduto = coproduto; }
     public List<Fluxo> getInputs() { return inputs; }
     public void setInputs(List<Fluxo> inputs) { this.inputs = inputs; }
     public List<Fluxo> getOutputs() { return outputs; }
