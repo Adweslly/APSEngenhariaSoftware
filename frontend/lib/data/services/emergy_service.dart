@@ -19,7 +19,11 @@ class EmergyService {
       'formato': formato,
     });
     if (response.statusCode != 200) {
-      throw Exception('Falha ao importar LCI');
+      String errorMessage = 'Falha ao importar LCI';
+      try {
+        errorMessage = response.body;
+      } catch (_) {}
+      throw Exception(errorMessage);
     }
   }
 }

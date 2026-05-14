@@ -2,6 +2,8 @@ enum TipoProcesso {
   PRODUTOR,
   CONSUMIDOR,
   ARMAZENAMENTO,
+  RECURSO,
+  TRANSFORMACAO,
 }
 
 class ProcessoModel {
