@@ -1,0 +1,73 @@
+{
+  "processos": [
+    {
+      "id": 101,
+      "nome": "Radiação Solar",
+      "tipo": "RECURSO",
+      "categoria": "RENOVAVEL"
+    },
+    {
+      "id": 102,
+      "nome": "Precipitação (Chuva)",
+      "tipo": "RECURSO",
+      "categoria": "RENOVAVEL"
+    },
+    {
+      "id": 103,
+      "nome": "Fertilizantes NPK",
+      "tipo": "RECURSO",
+      "categoria": "NAO_RENOVAVEL"
+    },
+    {
+      "id": 104,
+      "nome": "Eletricidade",
+      "tipo": "RECURSO",
+      "categoria": "COMPRADO"
+    },
+    {
+      "id": 200,
+      "nome": "Produção de Soja",
+      "tipo": "TRANSFORMACAO",
+      "categoria": "PROCESSO"
+    }
+  ],
+  "fluxos": [
+    {
+      "nome": "Solar",
+      "quantidade": 2.5e10,
+      "tipoRecursoId": 1,
+      "transformidade": 1.0,
+      "origemId": 101,
+      "destinoId": 200
+    },
+    {
+      "nome": "Chuva",
+      "quantidade": 4.0e8,
+      "tipoRecursoId": 2,
+      "transformidade": 18200.0,
+      "origemId": 102,
+      "destinoId": 200
+    },
+    {
+      "nome": "Fertilizante",
+      "quantidade": 200.0,
+      "tipoRecursoId": 3,
+      "transformidade": 3.8e12,
+      "origemId": 103,
+      "destinoId": 200
+    },
+    {
+      "nome": "Eletricidade",
+      "quantidade": 850.0,
+      "tipoRecursoId": 4,
+      "transformidade": 1.8e11,
+      "origemId": 104,
+      "destinoId": 200
+    },
+    {
+      "nome": "Produto Soja",
+      "quantidade": 3000.0,
+      "origemId": 200
+    }
+  ]
+}
