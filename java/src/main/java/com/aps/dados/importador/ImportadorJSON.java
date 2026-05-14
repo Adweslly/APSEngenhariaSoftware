@@ -28,7 +28,7 @@ public class ImportadorJSON implements ImportadorLCI {
                     processo.setId(node.has("id") ? node.get("id").asLong() : null);
                     processo.setNome(node.get("nome").asText());
                     processo.setDescricao(node.has("descricao") ? node.get("descricao").asText() : "");
-                    processo.setTipo(TipoProcesso.valueOf(node.get("tipo").asText()));
+                    processo.setTipo(TipoProcesso.valueOf(node.get("tipo").asText().toUpperCase()));
                     processo.setCategoria(node.has("categoria") ? node.get("categoria").asText() : "");
                     processos.add(processo);
                 }

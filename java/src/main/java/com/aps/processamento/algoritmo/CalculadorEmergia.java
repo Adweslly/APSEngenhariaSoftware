@@ -31,39 +31,45 @@ public class CalculadorEmergia {
             for (Processo p : processos) {
                 double emergiaEntrada = 0;
 
-                for (Fluxo input : p.getInputs()) {
+                // Debug: Verificando entradas do processo
+                List<Fluxo> inputs = p.getInputs();
+                
+                for (Fluxo input : inputs) {
                     if (input.getOrigem() == null) {
-                        // Entrada externa, utiliza a transformidade base
+                        // Entrada externa (Recurso Primário)
                         emergiaEntrada += input.getQuantidade() * input.getTransformidade();
                     } else {
-                        // Entrada interna, utiliza a emergia calculada da origem
+                        // Entrada interna (Propagação de outro processo)
                         Processo origem = input.getOrigem();
-                        double emergiaTotalOrigem = emergiaAcumulada.get(origem);
+                        double emergiaTotalOrigem = emergiaAcumulada.getOrDefault(origem, 0.0);
                         
-                        if (origem.isCoproduto()) {
-                            // Co-produto: recebe a emergia total da origem
-                            emergiaEntrada += emergiaTotalOrigem;
+                        // Se a origem for um RECURSO sem origem própria, tratamos como fonte primária
+                        if (origem.getTipo() == com.aps.domain.enums.TipoProcesso.RECURSO && 
+                            origem.getInputs().isEmpty()) {
+                            emergiaEntrada += input.getQuantidade() * input.getTransformidade();
                         } else {
-                            // Split (Divisão): recebe emergia proporcional
-                            double energiaTotalSaida = origem.getOutputs().stream()
+                            // Split: recebe emergia proporcional à energia que flui
+                            double energiaTotalSaidaOrigem = origem.getOutputs().stream()
                                     .mapToDouble(Fluxo::getQuantidade).sum();
-                            if (energiaTotalSaida > 0) {
-                                emergiaEntrada += emergiaTotalOrigem * (input.getQuantidade() / energiaTotalSaida);
+                            
+                            if (energiaTotalSaidaOrigem > 0) {
+                                double proporcao = input.getQuantidade() / energiaTotalSaidaOrigem;
+                                emergiaEntrada += emergiaTotalOrigem * proporcao;
                             }
                         }
                     }
                 }
 
-                double diff = Math.abs(emergiaEntrada - emergiaAcumulada.get(p));
+                double anterior = emergiaAcumulada.get(p);
+                double diff = Math.abs(emergiaEntrada - anterior);
                 maxDiff = Math.max(maxDiff, diff);
                 proximaEmergia.put(p, emergiaEntrada);
             }
 
             emergiaAcumulada = proximaEmergia;
 
-            if (maxDiff < CONVERGENCE_THRESHOLD && iter > 0) {
-                break;
-            }
+            // Convergência
+            if (maxDiff < CONVERGENCE_THRESHOLD && iter > 0) break;
         }
 
         // Finaliza os resultados
@@ -76,11 +82,7 @@ public class CalculadorEmergia {
             
             res.setEmergiaTotal(emergiaTotal);
             res.setTransformidade(energiaTotalSaida > 0 ? emergiaTotal / energiaTotalSaida : 0);
-            
-            // Para o MVP, simplificamos direta/indireta
-            // O cálculo real requer rastreamento detalhado dos tipos de fonte
-            res.setEmergiaDireta(emergiaTotal); // Simplificado
-            res.setEmergiaIndireta(0);
+            res.setEmergiaDireta(emergiaTotal); // Simplificado no MVP
         }
 
         return resultados;
