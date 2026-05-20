@@ -27,7 +27,7 @@ class EmergyProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _service.importarLCI(conteudo, formato);
+      _resultados = await _service.importarLCI(conteudo, formato);
     } catch (e) {
       debugPrint(e.toString());
       rethrow;

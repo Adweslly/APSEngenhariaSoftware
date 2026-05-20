@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../state/emergy_provider.dart';
+import '../../state/processo_provider.dart';
 
 class ImportacaoScreen extends StatefulWidget {
   const ImportacaoScreen({super.key});
@@ -38,6 +39,10 @@ class _ImportacaoScreenState extends State<ImportacaoScreen> {
       return;
     }
 
+    final emergyProvider = context.read<EmergyProvider>();
+    final processoProvider = context.read<ProcessoProvider>();
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     try {
       String conteudo;
       if (kIsWeb) {
@@ -46,21 +51,22 @@ class _ImportacaoScreenState extends State<ImportacaoScreen> {
         conteudo = await File(_selectedFile!.path!).readAsString();
       }
 
-      await context.read<EmergyProvider>().importarLCI(
+      await emergyProvider.importarLCI(
         conteudo,
         _selectedFormat,
       );
+      await processoProvider.fetchProcessos();
       
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Importação concluída com sucesso!')),
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(content: Text('Importação e cálculo concluídos com sucesso!')),
       );
       setState(() {
         _selectedFile = null;
       });
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(content: Text('Erro na importação: $e')),
       );
     }
