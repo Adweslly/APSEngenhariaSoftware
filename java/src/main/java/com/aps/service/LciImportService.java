@@ -1,7 +1,5 @@
 package com.aps.service;
 
-import com.aps.dados.importador.ImportadorJSON;
-import com.aps.dados.importador.ImportadorLCI;
 import com.aps.dados.repositorio.FluxoRepository;
 import com.aps.dados.repositorio.ProcessoRepository;
 import com.aps.dados.repositorio.TipoRecursoRepository;
@@ -11,6 +9,7 @@ import com.aps.domain.model.Fluxo;
 import com.aps.domain.model.Processo;
 import com.aps.domain.model.TipoRecurso;
 import com.aps.web.dto.ImportLCIDTO;
+import com.aps.web.dto.ResultadoDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class LciImportService {
@@ -34,97 +32,115 @@ public class LciImportService {
     @Autowired
     private TipoRecursoRepository tipoRecursoRepository;
 
+    @Autowired
+    private EmergyCalculationService calculationService;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Transactional
-    public void importar(ImportLCIDTO dto) {
+    public List<ResultadoDTO> importar(ImportLCIDTO dto) {
         if ("JSON".equalsIgnoreCase(dto.getFormato())) {
             importarJSON(dto.getConteudo());
-        } else {
-            throw new RuntimeException("Formato não suportado: " + dto.getFormato());
+            return calculationService.calcularTudo();
         }
+
+        throw new RuntimeException("Formato nao suportado: " + dto.getFormato());
     }
 
     private void importarJSON(String conteudo) {
         try {
             JsonNode root = objectMapper.readTree(conteudo);
             Map<Long, Processo> mapaIds = new HashMap<>();
+            Map<Long, TipoRecurso> tiposRecursoImportados = new HashMap<>();
 
-            // 1. Importar Processos
             JsonNode processosNode = root.get("processos");
             if (processosNode != null && processosNode.isArray()) {
                 for (JsonNode node : processosNode) {
-                    Processo p = new Processo();
-                    p.setNome(node.get("nome").asText());
-                    p.setDescricao(node.has("descricao") ? node.get("descricao").asText() : "");
-                    p.setTipo(com.aps.domain.enums.TipoProcesso.valueOf(node.get("tipo").asText().toUpperCase()));
-                    p.setCategoria(node.has("categoria") ? node.get("categoria").asText() : "");
-                    
-                    Processo salvo = processoRepository.save(p);
+                    Processo processo = new Processo();
+                    processo.setNome(node.get("nome").asText());
+                    processo.setDescricao(node.has("descricao") ? node.get("descricao").asText() : "");
+                    processo.setTipo(com.aps.domain.enums.TipoProcesso.valueOf(node.get("tipo").asText().toUpperCase()));
+                    processo.setCategoria(node.has("categoria") ? node.get("categoria").asText() : "");
+
+                    Processo salvo = processoRepository.save(processo);
                     if (node.has("id")) {
                         mapaIds.put(node.get("id").asLong(), salvo);
                     }
                 }
             }
 
-            // 2. Importar Fluxos
             JsonNode fluxosNode = root.get("fluxos");
             if (fluxosNode != null && fluxosNode.isArray()) {
                 for (JsonNode node : fluxosNode) {
-                    Fluxo f = new Fluxo();
-                    f.setQuantidade(node.get("quantidade").asDouble());
-                    
-                    if (node.has("tipoRecursoId")) {
-                        Long trId = node.get("tipoRecursoId").asLong();
-                        Optional<TipoRecurso> trOpt = tipoRecursoRepository.findById(trId);
-                        
-                        if (trOpt.isPresent()) {
-                            f.setTipoRecurso(trOpt.get());
-                        } else {
-                            // Criar TipoRecurso automaticamente se não existir para o teste ser fluido
-                            TipoRecurso novoTr = new TipoRecurso();
-                            novoTr.setNome("Recurso Automático " + trId);
-                            novoTr.setTransformidade(node.has("transformidade") ? node.get("transformidade").asDouble() : 1.0);
-                            
-                            // Tentar inferir o TipoFonte pela categoria do processo de origem se for RECURSO
-                            if (node.has("origemId")) {
-                                Processo origem = mapaIds.get(node.get("origemId").asLong());
-                                if (origem != null && origem.getTipo() == com.aps.domain.enums.TipoProcesso.RECURSO) {
-                                    try {
-                                        novoTr.setTipoFonte(TipoFonte.valueOf(origem.getCategoria().toUpperCase()));
-                                    } catch (Exception e) {
-                                        novoTr.setTipoFonte(TipoFonte.COMPRADO);
-                                    }
-                                }
-                            }
-                            
-                            if (novoTr.getTipoFonte() == null) novoTr.setTipoFonte(TipoFonte.COMPRADO);
-                            novoTr.setCategoria(CategoriaRecurso.ENERGIA);
-                            
-                            TipoRecurso salvoTr = tipoRecursoRepository.save(novoTr);
-                            f.setTipoRecurso(salvoTr);
-                        }
-                    }
-                    
+                    Fluxo fluxo = new Fluxo();
+                    fluxo.setQuantidade(node.get("quantidade").asDouble());
+                    fluxo.setTipoRecurso(resolverTipoRecurso(node, mapaIds, tiposRecursoImportados));
+
                     if (node.has("origemId")) {
-                        f.setOrigem(mapaIds.get(node.get("origemId").asLong()));
+                        fluxo.setOrigem(mapaIds.get(node.get("origemId").asLong()));
                     }
-                    
+
                     if (node.has("destinoId")) {
-                        f.setDestino(mapaIds.get(node.get("destinoId").asLong()));
+                        fluxo.setDestino(mapaIds.get(node.get("destinoId").asLong()));
                     }
-                    
-                    if (f.getTipoRecurso() != null) {
-                        f.setTransformidade(f.getTipoRecurso().getTransformidade());
-                        f.calcularCustoEmergia();
+
+                    if (fluxo.getTipoRecurso() != null) {
+                        fluxo.setTransformidade(fluxo.getTipoRecurso().getTransformidade());
+                    } else if (node.has("transformidade")) {
+                        fluxo.setTransformidade(node.get("transformidade").asDouble());
                     }
-                    
-                    fluxoRepository.save(f);
+
+                    if (fluxo.getTransformidade() > 0) {
+                        fluxo.calcularCustoEmergia();
+                    }
+
+                    fluxoRepository.save(fluxo);
                 }
             }
-
         } catch (Exception e) {
-            throw new RuntimeException("Erro na importação JSON: " + e.getMessage(), e);
+            throw new RuntimeException("Erro na importacao JSON: " + e.getMessage(), e);
         }
+    }
+
+    private TipoRecurso resolverTipoRecurso(JsonNode node, Map<Long, Processo> mapaIds, Map<Long, TipoRecurso> tiposRecursoImportados) {
+        if (!node.has("tipoRecursoId")) {
+            return null;
+        }
+
+        Long idLocal = node.get("tipoRecursoId").asLong();
+        TipoRecurso existenteNaImportacao = tiposRecursoImportados.get(idLocal);
+        if (existenteNaImportacao != null) {
+            return existenteNaImportacao;
+        }
+
+        TipoRecurso novoTipoRecurso = new TipoRecurso();
+        novoTipoRecurso.setNome(node.has("nome") ? node.get("nome").asText() : "Recurso Importado " + idLocal);
+        novoTipoRecurso.setTransformidade(node.has("transformidade") ? node.get("transformidade").asDouble() : 1.0);
+        novoTipoRecurso.setTipoFonte(inferirTipoFonte(node, mapaIds));
+        novoTipoRecurso.setCategoria(CategoriaRecurso.ENERGIA);
+
+        TipoRecurso salvo = tipoRecursoRepository.save(novoTipoRecurso);
+        tiposRecursoImportados.put(idLocal, salvo);
+        return salvo;
+    }
+
+    private TipoFonte inferirTipoFonte(JsonNode node, Map<Long, Processo> mapaIds) {
+        if (node.has("origemId")) {
+            Processo origem = mapaIds.get(node.get("origemId").asLong());
+            if (origem != null && origem.getCategoria() != null) {
+                String categoria = origem.getCategoria().toUpperCase();
+                if (categoria.contains("NAO_RENOVAVEL")) {
+                    return TipoFonte.NAO_RENOVAVEL;
+                }
+                if (categoria.contains("RENOVAVEL")) {
+                    return TipoFonte.RENOVAVEL;
+                }
+                if (categoria.contains("COMPRADO") || categoria.contains("SERVICO")) {
+                    return TipoFonte.COMPRADO;
+                }
+            }
+        }
+
+        return TipoFonte.COMPRADO;
     }
 }
