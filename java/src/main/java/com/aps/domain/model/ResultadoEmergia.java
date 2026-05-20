@@ -18,6 +18,9 @@ public class ResultadoEmergia {
     private double emergiaDireta;
     private double emergiaIndireta;
     private double transformidade;
+    private double renovavel;
+    private double naoRenovavel;
+    private double comprado;
     private double elr;
     private double eyr;
     private double esi;
@@ -42,6 +45,12 @@ public class ResultadoEmergia {
     public void setEmergiaIndireta(double emergiaIndireta) { this.emergiaIndireta = emergiaIndireta; }
     public double getTransformidade() { return transformidade; }
     public void setTransformidade(double transformidade) { this.transformidade = transformidade; }
+    public double getRenovavel() { return renovavel; }
+    public void setRenovavel(double renovavel) { this.renovavel = renovavel; }
+    public double getNaoRenovavel() { return naoRenovavel; }
+    public void setNaoRenovavel(double naoRenovavel) { this.naoRenovavel = naoRenovavel; }
+    public double getComprado() { return comprado; }
+    public void setComprado(double comprado) { this.comprado = comprado; }
     public double getElr() { return elr; }
     public void setElr(double elr) { this.elr = elr; }
     public double getEyr() { return eyr; }

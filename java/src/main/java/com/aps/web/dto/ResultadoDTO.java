@@ -10,6 +10,10 @@ public class ResultadoDTO {
     private double emergiaDireta;
     private double emergiaIndireta;
     private double transformidade;
+    private double renovavel;
+    private double naoRenovavel;
+    private double comprado;
+    private boolean processoFinal;
     private LocalDateTime dataCalculo;
     private Double elr;
     private Double eyr;
@@ -31,6 +35,14 @@ public class ResultadoDTO {
     public void setEmergiaIndireta(double emergiaIndireta) { this.emergiaIndireta = emergiaIndireta; }
     public double getTransformidade() { return transformidade; }
     public void setTransformidade(double transformidade) { this.transformidade = transformidade; }
+    public double getRenovavel() { return renovavel; }
+    public void setRenovavel(double renovavel) { this.renovavel = renovavel; }
+    public double getNaoRenovavel() { return naoRenovavel; }
+    public void setNaoRenovavel(double naoRenovavel) { this.naoRenovavel = naoRenovavel; }
+    public double getComprado() { return comprado; }
+    public void setComprado(double comprado) { this.comprado = comprado; }
+    public boolean isProcessoFinal() { return processoFinal; }
+    public void setProcessoFinal(boolean processoFinal) { this.processoFinal = processoFinal; }
     public LocalDateTime getDataCalculo() { return dataCalculo; }
     public void setDataCalculo(LocalDateTime dataCalculo) { this.dataCalculo = dataCalculo; }
     public Double getElr() { return elr; }
