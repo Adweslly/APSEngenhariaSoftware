@@ -6,6 +6,10 @@ class ResultadoModel {
   final double emergiaDireta;
   final double emergiaIndireta;
   final double transformidade;
+  final double renovavel;
+  final double naoRenovavel;
+  final double comprado;
+  final bool processoFinal;
   final DateTime? dataCalculo;
   final double? elr;
   final double? eyr;
@@ -19,6 +23,10 @@ class ResultadoModel {
     required this.emergiaDireta,
     required this.emergiaIndireta,
     required this.transformidade,
+    required this.renovavel,
+    required this.naoRenovavel,
+    required this.comprado,
+    required this.processoFinal,
     this.dataCalculo,
     this.elr,
     this.eyr,
@@ -34,6 +42,10 @@ class ResultadoModel {
       emergiaDireta: (json['emergiaDireta'] as num).toDouble(),
       emergiaIndireta: (json['emergiaIndireta'] as num).toDouble(),
       transformidade: (json['transformidade'] as num).toDouble(),
+      renovavel: ((json['renovavel'] ?? 0) as num).toDouble(),
+      naoRenovavel: ((json['naoRenovavel'] ?? 0) as num).toDouble(),
+      comprado: ((json['comprado'] ?? 0) as num).toDouble(),
+      processoFinal: json['processoFinal'] == true,
       dataCalculo: json['dataCalculo'] != null 
           ? DateTime.parse(json['dataCalculo']) 
           : null,

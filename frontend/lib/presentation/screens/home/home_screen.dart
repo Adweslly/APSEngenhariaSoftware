@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../dashboard/dashboard_screen.dart';
 import '../importacao/importacao_screen.dart';
 import '../processos/processos_screen.dart';
 import '../resultados/resultados_screen.dart';
@@ -16,7 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
-    const Center(child: Text('Dashboard - Bem-vindo ao Sistema de Emergia')),
+    const DashboardScreen(),
     const ImportacaoScreen(),
     const ProcessosScreen(),
     const VisualizacaoScreen(),
