@@ -1,77 +1,133 @@
-# APS - Engenharia de Software
+# APS Engenharia de Software
 
-Sistema computacional para cálculo de emergia em sistemas complexos, baseado em dados de Inventários de Ciclo de Vida (LCI).
+Sistema para analise de emergia em sistemas produtivos, com backend em Spring Boot e frontend em Flutter. O projeto recebe dados de Inventario de Ciclo de Vida (LCI), organiza processos e fluxos, executa calculos emergeticos e apresenta resultados e indicadores de sustentabilidade.
 
-## Sobre o Projeto
+## Estado atual
 
-Este projeto foi desenvolvido como trabalho de APS (Atividade Prática Supervisionada) para cálculo de emergia, um conceito desenvolvido por H. T. Odum que permite quantificar em uma unidade comum (sej - solar emjoule) todas as formas de energia utilizadas em um processo produtivo.
+O projeto possui dois modulos principais:
 
-## Módulos do Sistema
+- `java/`: API REST em Java 17 com Spring Boot 3.2, Maven, JPA, banco H2 em memoria e documentacao Swagger/OpenAPI.
+- `frontend/`: aplicacao Flutter que consome a API, permite importar LCI, gerenciar processos, visualizar rede de processos e consultar resultados.
 
-### 1. Dados
-- **Importador LCI**: Leitura e parsing de arquivos LCI (JSON)
-- **Repositório**: Armazenamento e gerenciamento de dados
-- **Transformador**: Conversão de dados LCI para estruturas do sistema
+Tambem existem arquivos JSON de exemplo na raiz:
 
-### 2. Processamento
-- **Algoritmo de Emergia**: Implementação da álgebra emergética e cálculo
-- **Validador Algebra**: Verificação de consistência (evitar contagem dupla)
-- **Indicadores**: Cálculo de EYR, ELR, ESI
+- `exemplo_lci_soja.json`
+- `analise_complexa_biodiesel.json`
 
-### 3. Apresentação
-- **Visualizador**: Display de resultados e diagramas
-- **Gerador de Relatórios**: Exportação de resultados
-- **Configuração**: Parametrização do sistema
+## Como funciona
 
-## Tecnologias
+1. O frontend envia requisicoes para a API em `http://localhost:8080/api`.
+2. A API cadastra processos, recursos e fluxos no banco H2 em memoria.
+3. A importacao LCI recebe conteudo JSON e transforma esses dados em estruturas do dominio.
+4. O motor de calculo processa os fluxos de entrada e saida, calcula emergia direta, indireta e total.
+5. Os resultados retornam para o frontend com indicadores como EYR, ELR e ESI.
 
-| Componente | Tecnologia |
-|------------|------------|
-| Linguagem | Java 17+ |
-| Framework | Spring Boot 3.2 |
-| Build | Maven |
-| Database | H2 (dev) |
+Como o banco H2 esta configurado em memoria, os dados sao recriados a cada nova execucao do backend.
 
-## Estrutura
+## Requisitos
 
-```
-java/
-├── src/main/java/com/aps/
-│   ├── domain/           # Modelo de domínio
-│   ├── dados/          # Camada de dados
-│   ├── processamento/   # Processamento
-│   ├── apresentacao/   # Apresentação
-│   └── web/            # API REST
-└── pom.xml
-```
+- Java 17 ou superior
+- Maven
+- Flutter SDK com Dart compativel com `^3.11.5`
+- Backend rodando na porta `8080` antes de usar as telas do frontend que consomem a API
 
-## Como Executar
+## Rodar o backend
 
 ```bash
 cd java
 mvn spring-boot:run
 ```
 
-A aplicação estará disponível em `http://localhost:8080`
+Servicos principais:
 
-## API Endpoints
+- API: `http://localhost:8080/api`
+- Swagger UI: `http://localhost:8080/swagger-ui/index.html`
+- H2 Console: `http://localhost:8080/h2-console`
 
-### Processos
-- `GET /api/processos` - Listar processos
-- `POST /api/processos` - Criar processo
-- `GET /api/processos/{id}` - Buscar processo
+Credenciais do H2:
 
-### Redes
-- `GET /api/redes` - Listar redes
-- `POST /api/redes/{id}/calcular` - Calcular emergia
-- `POST /api/redes/{id}/calcular-elr` - Calcular ELR
+- JDBC URL: `jdbc:h2:mem:apsdb`
+- User: `sa`
+- Password: vazio
 
-## Documentação
+## Rodar o frontend
 
-- [SPEC.md](./SPEC.md) - Especificação completa do projeto
-- [plano_implementacao.md](./plano_implementacao.md) - Plano de implementação
-- [relatorio_emergia.md](./relatorio_emergia.md) - Relatório de emergia
+```bash
+cd frontend
+flutter pub get
+flutter run
+```
 
-## Licência
+A URL da API usada pelo frontend esta em:
 
-Este projeto é para fins acadêmicos.
+```text
+frontend/lib/core/api/api_base.dart
+```
+
+Valor atual:
+
+```text
+http://localhost:8080/api
+```
+
+## Funcionalidades disponiveis
+
+- Dashboard inicial da aplicacao.
+- Importacao de dados LCI via JSON.
+- Listagem, criacao, atualizacao e exclusao de processos.
+- Consulta de fluxos no frontend.
+- Calculo de emergia para os dados cadastrados/importados.
+- Exibicao de resultados e indicadores.
+- Visualizacao grafica da rede de processos.
+- API REST documentada com Swagger.
+
+## Endpoints principais
+
+- `GET /api/processos`
+- `POST /api/processos`
+- `PUT /api/processos/{id}`
+- `DELETE /api/processos/{id}`
+- `GET /api/fluxos`
+- `POST /api/fluxos`
+- `GET /api/recursos`
+- `POST /api/recursos`
+- `GET /api/redes`
+- `POST /api/redes`
+- `POST /api/redes/{id}/calcular`
+- `GET /api/emergy/calculate`
+- `POST /api/lci/import`
+
+## Testes
+
+Backend:
+
+```bash
+cd java
+mvn test
+```
+
+Frontend:
+
+```bash
+cd frontend
+flutter test
+```
+
+## Documentacao
+
+O README da raiz serve como guia rapido de funcionamento e execucao. Documentos tecnicos, especificacoes, relatorios e materiais de apoio ficam em `docs/`.
+
+Arquivos principais:
+
+- `docs/implementacao_tecnica.md`: detalhes tecnicos e arquitetura atual.
+- `docs/SPEC.md`: especificacao original do projeto.
+- `docs/plano_implementacao.md`: plano de implementacao.
+- `docs/relatorio_emergia.md`: relatorio sobre emergia.
+- `docs/backend_java.md`: README anterior do backend.
+- `docs/frontend_flutter.md`: README anterior do frontend.
+- `docs/sprint1_backend_mvp.md`: documentacao da sprint/MVP do backend.
+- `docs/ES_Orientacoes_Aluno.md`: orientacoes academicas.
+
+## Licenca
+
+Projeto academico desenvolvido para APS de Engenharia de Software.
